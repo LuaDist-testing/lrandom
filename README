@@ -18,8 +18,8 @@ Please send comments, suggestions, and bug reports to lhf@tecgraf.puc-rio.br .
 -------------------------------------------------------------------------------
 
 random library:
- clone(c)                tostring(c)             valuex(c) 
- new([seed])             value(c)                version 
- seed(c,[seed])          valuei(c,a,[b]) 
+ __call(c) 		 new([seed]) 		 version 
+ __tostring(c) 		 seed(c,[seed]) 
+ clone(c) 		 value(c,[a,b]) 
 
 -------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 # makefile for random library for Lua
 
 # change these to reflect your Lua installation
-LUA= /tmp/lhf/lua-5.1.2
+LUA= /tmp/lhf/lua-5.1.4
 LUAINC= $(LUA)/src
 LUALIB= $(LUA)/src
 LUABIN= $(LUA)/src
@@ -17,6 +17,8 @@ CC= gcc
 CFLAGS= $(INCS) $(WARN) -O2 $G
 WARN= -ansi -pedantic -Wall
 INCS= -I$(LUAINC)
+MAKESO= $(CC) -shared
+#MAKESO= env MACOSX_DEPLOYMENT_TARGET=10.3 $(CC) -bundle -undefined dynamic_lookup
 
 MYNAME= random
 MYLIB= l$(MYNAME)
@@ -34,7 +36,7 @@ o:	$(MYLIB).o
 so:	$T
 
 $T:	$(OBJS)
-	$(CC) -o $@ -shared $(OBJS)
+	$(MAKESO) -o $@ $(OBJS)
 
 $(OBJS): random.c
 
@@ -52,10 +54,8 @@ D= $(MYNAME)
 A= $(MYLIB).tar.gz
 TOTAR= Makefile,README,$(MYLIB).c,test.lua,random.c
 
-tar:	clean
+distr:	clean
 	tar zcvf $A -C .. $D/{$(TOTAR)}
-
-distr:	tar
 	touch -r $A .stamp
 	mv $A $(FTP)
 

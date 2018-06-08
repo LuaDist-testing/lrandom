@@ -2,7 +2,7 @@
 * lrandom.c
 * random-number library for Lua 5.1 based on the Mersenne Twister
 * Luiz Henrique de Figueiredo <lhf@tecgraf.puc-rio.br>
-* 27 Jun 2007 23:52:15
+* 23 Jun 2009 22:46:36
 * This code is hereby placed in the public domain.
 */
 
@@ -13,10 +13,10 @@
 #include "lauxlib.h"
 
 #define MYNAME		"random"
-#define MYVERSION	MYNAME " library for " LUA_VERSION " / Jun 2007"
+#define MYVERSION	MYNAME " library for " LUA_VERSION " / Jun 2009"
 #define MYTYPE		MYNAME " handle"
 
-#define SEED		2007UL
+#define SEED		2009UL
 
 #include "random.c"
 
@@ -53,42 +53,38 @@ static int Lseed(lua_State *L)			/** seed(c,[seed]) */
 {
  MT *c=Pget(L,1);
  init_genrand(c,luaL_optlong(L,2,SEED));
- return 0;
-}
-
-static int Lvalue(lua_State *L)			/** value(c) */
-{
- MT *c=Pget(L,1);
- lua_pushnumber(L,genrand_real1(c));
+ lua_settop(L,1);
  return 1;
 }
 
-static int Lvaluei(lua_State *L)		/** valuei(c,a,[b]) */
+static int Lvalue(lua_State *L)			/** value(c,[a,b]) */
 {
  MT *c=Pget(L,1);
- int a,b;
- if (lua_gettop(L)==2)
+ double a,b,r=genrand_res53(c);
+ switch (lua_gettop(L))
  {
-  a=1;
-  b=luaL_checkint(L,2);
+  case 1:
+   lua_pushnumber(L,r);
+   return 1;
+  case 2:
+   a=1;
+   b=luaL_checknumber(L,2);
+   break;
+  default:
+   a=luaL_checknumber(L,2);
+   b=luaL_checknumber(L,3);
+   break;
  }
- else
- {
-  a=luaL_checkint(L,2);
-  b=luaL_checkint(L,3);
- }
- lua_pushnumber(L,floor(a+genrand_real2(c)*(b-a+1)));
+ if (a>b) { double t=a; a=b; b=t; }
+ a=ceil(a);
+ b=floor(b);
+ if (a>b) return 0;
+ r=a+floor(r*(b-a+1));
+ lua_pushnumber(L,r);
  return 1;
 }
 
-static int Lvaluex(lua_State *L)		/** valuex(c) */
-{
- MT *c=Pget(L,1);
- lua_pushnumber(L,genrand_res53(c));
- return 1;
-}
-
-static int Ltostring(lua_State *L)		/** tostring(c) */
+static int Ltostring(lua_State *L)
 {
  MT *c=Pget(L,1);
  lua_pushfstring(L,"%s %p",MYTYPE,(void*)c);
@@ -97,28 +93,28 @@ static int Ltostring(lua_State *L)		/** tostring(c) */
 
 static const luaL_reg R[] =
 {
-	{ "__tostring",	Ltostring	},
+	{ "__tostring",	Ltostring	},	/** __tostring(c) */
 	{ "clone",	Lclone		},
 	{ "new",	Lnew		},
 	{ "seed",	Lseed		},
-	{ "tostring",	Ltostring	},
 	{ "value",	Lvalue		},
-	{ "valuei",	Lvaluei		},
-	{ "valuex",	Lvaluex		},
 	{ NULL,		NULL		}
 };
 
 LUALIB_API int luaopen_random(lua_State *L)
 {
  luaL_newmetatable(L,MYTYPE);
- lua_pushvalue(L,-1);
- luaL_openlib(L,NULL,R,0);
+ lua_setglobal(L,MYNAME);
+ luaL_register(L,MYNAME,R);
  lua_pushliteral(L,"version");			/** version */
  lua_pushliteral(L,MYVERSION);
  lua_settable(L,-3);
  lua_pushliteral(L,"__index");
  lua_pushvalue(L,-2);
  lua_settable(L,-3);
- lua_setglobal(L,MYNAME);
+ lua_pushliteral(L,"__call");			/** __call(c) */
+ lua_pushliteral(L,"value");
+ lua_gettable(L,-3);
+ lua_settable(L,-3);
  return 1;
 }
