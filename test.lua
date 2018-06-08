@@ -1,6 +1,6 @@
 -- test random library
 
-require"random"
+local random=require"random"
 
 print(random.version)
 print""

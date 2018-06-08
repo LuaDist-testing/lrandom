@@ -1,8 +1,8 @@
 /*
 * lrandom.c
-* random-number library for Lua 5.1 based on the Mersenne Twister
+* random-number library for Lua 5.2 based on the Mersenne Twister
 * Luiz Henrique de Figueiredo <lhf@tecgraf.puc-rio.br>
-* 18 Nov 2010 19:11:40
+* 30 Apr 2012 14:10:37
 * This code is hereby placed in the public domain.
 */
 
@@ -16,11 +16,11 @@
 #include "random.c"
 
 #define MYNAME		"random"
-#define MYVERSION	MYNAME " library for " LUA_VERSION " / Nov 2010 / "\
+#define MYVERSION	MYNAME " library for " LUA_VERSION " / Apr 2012 / "\
 			"using " AUTHOR
 #define MYTYPE		MYNAME " handle"
 
-#define SEED		2010UL
+#define SEED		2012UL
 
 static MT *Pget(lua_State *L, int i)
 {
@@ -30,8 +30,7 @@ static MT *Pget(lua_State *L, int i)
 static MT *Pnew(lua_State *L)
 {
  MT *c=lua_newuserdata(L,sizeof(MT));
- luaL_getmetatable(L,MYTYPE);
- lua_setmetatable(L,-2);
+ luaL_setmetatable(L,MYTYPE);
  return c;
 }
 
@@ -106,8 +105,7 @@ static const luaL_Reg R[] =
 LUALIB_API int luaopen_random(lua_State *L)
 {
  luaL_newmetatable(L,MYTYPE);
- lua_setglobal(L,MYNAME);
- luaL_register(L,MYNAME,R);
+ luaL_setfuncs(L,R,0);
  lua_pushliteral(L,"version");			/** version */
  lua_pushliteral(L,MYVERSION);
  lua_settable(L,-3);
