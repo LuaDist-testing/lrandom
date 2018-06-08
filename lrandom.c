@@ -2,7 +2,7 @@
 * lrandom.c
 * random-number library for Lua 5.1 based on the Mersenne Twister
 * Luiz Henrique de Figueiredo <lhf@tecgraf.puc-rio.br>
-* 23 Jun 2009 22:46:36
+* 18 Nov 2010 19:11:40
 * This code is hereby placed in the public domain.
 */
 
@@ -12,13 +12,15 @@
 #include "lua.h"
 #include "lauxlib.h"
 
+/* #define GENRAND32 if you want a 32-bit generator instead of a 53-bit one */
+#include "random.c"
+
 #define MYNAME		"random"
-#define MYVERSION	MYNAME " library for " LUA_VERSION " / Jun 2009"
+#define MYVERSION	MYNAME " library for " LUA_VERSION " / Nov 2010 / "\
+			"using " AUTHOR
 #define MYTYPE		MYNAME " handle"
 
-#define SEED		2009UL
-
-#include "random.c"
+#define SEED		2010UL
 
 static MT *Pget(lua_State *L, int i)
 {
@@ -35,7 +37,7 @@ static MT *Pnew(lua_State *L)
 
 static int Lnew(lua_State *L)			/** new([seed]) */
 {
- long seed=luaL_optlong(L,1,SEED);
+ lua_Number seed=luaL_optnumber(L,1,SEED);
  MT *c=Pnew(L);
  init_genrand(c,seed);
  return 1;
@@ -52,7 +54,7 @@ static int Lclone(lua_State *L)			/** clone(c) */
 static int Lseed(lua_State *L)			/** seed(c,[seed]) */
 {
  MT *c=Pget(L,1);
- init_genrand(c,luaL_optlong(L,2,SEED));
+ init_genrand(c,luaL_optnumber(L,2,SEED));
  lua_settop(L,1);
  return 1;
 }
@@ -60,7 +62,7 @@ static int Lseed(lua_State *L)			/** seed(c,[seed]) */
 static int Lvalue(lua_State *L)			/** value(c,[a,b]) */
 {
  MT *c=Pget(L,1);
- double a,b,r=genrand_res53(c);
+ double a,b,r=genrand(c);
  switch (lua_gettop(L))
  {
   case 1:
@@ -91,7 +93,7 @@ static int Ltostring(lua_State *L)
  return 1;
 }
 
-static const luaL_reg R[] =
+static const luaL_Reg R[] =
 {
 	{ "__tostring",	Ltostring	},	/** __tostring(c) */
 	{ "clone",	Lclone		},

@@ -1,16 +1,16 @@
 -- This file was automatically generated for the LuaDist project.
 
 package="lrandom"
-version="20090623-1"
+version="20101118-1"
 -- LuaDist source
 source = {
-  tag = "20090623-1",
+  tag = "20101118-1",
   url = "git://github.com/LuaDist-testing/lrandom.git"
 }
 -- Original source
 -- source = {
 --    url = "http://www.tecgraf.puc-rio.br/~lhf/ftp/lua//5.1/lrandom.tar.gz",
---    md5 = "44cc74cc1d9aec329021cffd532a6198",
+--    md5="2c99b45fbc3061f64b05ca7ec83a0299",
 --    dir = "random"
 -- }
 description = {
